@@ -9,6 +9,8 @@ import UIKit
 
 class LoginViewController: UIViewController , UITextFieldDelegate {
     
+    // probably will create a custom error enum
+    
     // MARK: -IBOultets
     
     @IBOutlet weak var emailTextField: UITextField!
