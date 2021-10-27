@@ -44,33 +44,63 @@ class LoginViewController: UIViewController , UITextFieldDelegate {
     
     @IBAction func loginButtonPressed(_ sender: UIButton) {
         loggingIn(true)
-        ClientUdacity.login(email: self.emailTextField.text ?? "" , password: self.passwordTextField.text ?? "", completion: handleLoginResponse(success: error:))
+        
+
+        
+        ClientUdacity.login(email: emailTextField.text ?? "" , password: passwordTextField.text ?? "") { succes , error  in
+            guard error == nil  else {
+                self.displayError(error, withMessage: "User name or password is incorrect")
+                self.loggingIn(false)
+                return
+            }
+            if succes {
+                DispatchQueue.main.async {
+                    self.performSegue(withIdentifier: "login", sender: nil)
+                }
+            }
+        }
+        
+    
         
     }
+    
+       
     
     @IBAction func signUpButtonPressed(_ sender: Any) {
         loggingIn(true)
         UIApplication.shared.open(urlSignUp, options: [:], completionHandler: nil)
-//        print("Sign up button pressed")
+        //        print("Sign up button pressed")
     }
     
     
-    func handleLoginResponse(success: Bool, error: Error?){
-        loggingIn(false)
-        if success {
-            DispatchQueue.main.async {
-                self.performSegue(withIdentifier: "login", sender: nil)
-            }
-        } else {
-            showAlert(message: "Invalid username or password ", title: "Error Logging In")
-//            showAlert(message: "Error Logging In", title: "Ok")
-            
-        }
-        
-    }
+    
     
     
     // MARK: -Think of a name
+    
+    func displayError(_ error: ClientUdacity.ErrorRequest?, withMessage message: String) {
+        DispatchQueue.main.async {
+            let alertVC = UIAlertController(title: "Error", message: nil, preferredStyle: .alert)
+            alertVC.addAction(UIAlertAction(title: "Ok", style: .default))
+            
+            
+            var alertMessage: String?
+            
+            switch error {
+            case .connectionError:
+                alertMessage = "There's a problem with your internet connection, please, fix it and try again."
+            case .responseError(_) :
+                alertMessage = message
+            default:
+                break
+            }
+            
+            alertVC.message = alertMessage
+
+            self.present(alertVC, animated: true)
+        }
+    }
+    
     func loggingIn(_ loggingIn :Bool){
         if loggingIn{
             DispatchQueue.main.async {

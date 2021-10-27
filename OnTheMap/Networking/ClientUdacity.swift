@@ -27,6 +27,14 @@ class ClientUdacity : NSObject {
         static var objectId = ""
     }
     
+    enum ErrorRequest: Error    {
+        case connectionError
+        case responseError(statusCode : Int?)
+//        case lackingDataError
+        
+        
+    }
+    
     static let ApplicationId = "QrX47CA9cyuGewLdsL7o5Eb8iug6Em8ye0dnAbIr"
     static let APIKey = "QuWThTdiRmTux3YaDseUSEpUKo7aBYM737yKd4gY"
     
@@ -77,11 +85,15 @@ class ClientUdacity : NSObject {
         return Singleton.shared
     }
     
+    
+    
+    
 
     // MARK: - Class Functions
 
     
-    class func login(email : String, password: String, completion:@escaping (Bool, Error?)-> Void){
+    
+    class func login(email : String, password: String, completion:@escaping (Bool, ErrorRequest?)-> Void){
         let body = "{\"udacity\": {\"username\": \"\(email)\", \"password\": \"\(password)\"}}"
         HelperFunctions.taskForPostRequest(url: Endpoints.LoginUdacity.url, type: "Udacity", responseType: LoginResponse.self, body: body, httpMethod: "POST") { response , error in
             if let response = response {
@@ -97,12 +109,13 @@ class ClientUdacity : NSObject {
                 
                 } else {
                     
-                    completion(false, nil)
+                    completion(false, error)
                     print("\(error) error fetched from login in client udacity")
                     
-                    
-                    
                 }
+          
+            
+
             }
         }
             

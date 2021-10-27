@@ -8,7 +8,7 @@
 import Foundation
 
 class HelperFunctions {
-    class  func taskForGetRequest <ResponseType: Decodable>(url : URL, type: String, responseType: ResponseType.Type, completion: @escaping(ResponseType?, Error?)->Void){
+    class  func taskForGetRequest <ResponseType: Decodable>(url : URL, type: String, responseType: ResponseType.Type, completion: @escaping(ResponseType?, ClientUdacity.ErrorRequest?)->Void){
        var  request = URLRequest(url: url)
        request.httpMethod = "GET"
        if type == "Udacity" {
@@ -20,11 +20,11 @@ class HelperFunctions {
        }
        let task = URLSession.shared.dataTask(with: request) { data , response , error in
            if error !=  nil{
-               completion(nil, error)
+               completion(nil, error as? ClientUdacity.ErrorRequest)
            }
            guard let data = data else {
                DispatchQueue.main.async {
-                   completion(nil, error)
+                   completion(nil, error as? ClientUdacity.ErrorRequest)
                }
                return
            }
@@ -43,14 +43,14 @@ class HelperFunctions {
            }
            catch{
                DispatchQueue.main.async {
-                   completion(nil, error)
+                   completion(nil, error as? ClientUdacity.ErrorRequest)
                }
            }
        }
        task.resume()
    }
 
-    class   func taskForPostRequest<ResponseType: Decodable>(url: URL, type: String, responseType: ResponseType.Type, body: String, httpMethod: String,completion: @escaping(ResponseType?, Error?)->Void){
+    class   func taskForPostRequest<ResponseType: Decodable>(url: URL, type: String, responseType: ResponseType.Type, body: String, httpMethod: String,completion: @escaping(ResponseType?, ClientUdacity.ErrorRequest?)->Void){
        
        var request =  URLRequest(url: url)
        if httpMethod == "POST"{
@@ -68,13 +68,18 @@ class HelperFunctions {
        
            
        let task = URLSession.shared.dataTask(with: request) { data , response , error  in
-           if   error != nil {
+//           if   error != nil {
+//               completion(nil, error as? ClientUdacity.ErrorRequest)
+//
+//           }
+           let error = self.checkForErrors( response: response, andError: error)
+           guard error == nil else {
                completion(nil, error)
-               
+               return
            }
            guard let data = data else {
                DispatchQueue.main.async {
-                   completion(nil, error)
+                   completion(nil, error as? ClientUdacity.ErrorRequest)
                }
                return
            }
@@ -96,12 +101,35 @@ class HelperFunctions {
            }
            catch {
                DispatchQueue.main.async {
-                   completion(nil, error)
+                  
+                   completion(nil, error as? ClientUdacity.ErrorRequest)
                }
            }
        }
        task.resume()
    }
+    
+    class  func checkForErrors( response: URLResponse?, andError error: Error?) -> ClientUdacity.ErrorRequest?{
+        guard error == nil else {
+            return ClientUdacity.ErrorRequest.connectionError
+        }
+        
+
+        guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+            var status: Int?
+
+            if let httpResponse = response as? HTTPURLResponse {
+                status = httpResponse.statusCode
+            }
+
+            return  ClientUdacity.ErrorRequest.responseError(statusCode: status)
+        }
+
+      
+
+        return nil
+    }
+    
 
 
 }
