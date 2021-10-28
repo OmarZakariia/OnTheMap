@@ -62,11 +62,15 @@ class MapViewC: UIViewController, MKMapViewDelegate {
     
     // MARK: - Functions
     func fetchStudentPins(){
-        self.activityIndicator.startAnimating()
+        DispatchQueue.main.async {
+            self.activityIndicator.startAnimating()
+        }
         ClientUdacity.getStudentLocation() { locations, error in
-            self.mapView.removeAnnotations(self.anonationsCreated)
-            self.anonationsCreated.removeAll()
-            self.locations = locations ?? []
+            DispatchQueue.main.async {
+                self.mapView.removeAnnotations(self.anonationsCreated)
+                self.anonationsCreated.removeAll()
+                self.locations = locations ?? []
+            }
             for dictionary in locations ?? [] {
                 let lat = CLLocationDegrees(dictionary.latitude ?? 0.0)
                 let lon = CLLocationDegrees(dictionary.longitude ?? 0.0)
