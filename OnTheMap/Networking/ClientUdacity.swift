@@ -162,17 +162,35 @@ class ClientUdacity : NSObject {
         task.resume()
     }
     // MARK: - Functions regarding location
-    class func getStudentLocation(completion: @escaping([StudentInfo]?,
-    Error?)->Void){
-        HelperFunctions.taskForGetRequest(url: Endpoints.getStudentLocations.url, type: "Parse", responseType: StudentLocation.self) { response , error in
+//    class func getStudentLocation(completion: @escaping([StudentInfo]?,Error?)->Void){
+//        HelperFunctions.taskForGetRequest(url: Endpoints.getStudentLocations.url, type: "Parse", responseType: StudentLocation.self) { response , error in
+//            if let response = response {
+//                completion(response.results, nil)
+////                print("\(response.results) this is the response from response.results")
+//            } else {
+//                completion([], error)
+//            }
+//        }
+//
+//    }
+//    class func getStudentLocations(completion: @escaping ([StudentInformation]?, Error?) -> Void) {
+//        RequestHelpers.taskForGETRequest(url: Endpoints.getStudentLocations.url, apiType: "Parse", responseType: StudentsLocation.self) { (response, error) in
+//            if let response = response {
+//                completion(response.results, nil)
+//            } else {
+//                completion([], error)
+//            }
+//        }
+//    }
+    
+    class func getStudentLocation(completion: @escaping ([StudentInfo]?, Error?)-> Void){
+        HelperFunctions.taskForGetRequest(url: Endpoints.getStudentLocations.url, type: "Parse", responseType: StudentLocation.self) { (response ,error) in
             if let response = response {
                 completion(response.results, nil)
-//                print("\(response.results) this is the response from response.results")
             } else {
                 completion([], error)
             }
         }
-        
     }
     
     class func addStudentLocation(info: StudentInfo, completion:@escaping(Bool, Error?)->Void){

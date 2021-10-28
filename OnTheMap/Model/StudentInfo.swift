@@ -49,5 +49,4 @@ struct StudentInfo: Codable {
         }
         return name
     }
- 
 }
